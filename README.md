@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project analyses the effectiveness of language learning apps across different user profiles. It was built end-to-end: from synthetic data generation, through a multi-layer PostgreSQL pipeline, to a Power BI dashboard.
+This project analyses the effectiveness of language learning apps across different user profiles. It was built end-to-end from synthetic data generation to a Power BI dashboard. The EDA/ELT pipelines are presented in two versions, PostgreSQL and Snowflake, that follow the same underlying implementation.
 
 ---
 
@@ -12,9 +12,9 @@ This project analyses the effectiveness of language learning apps across differe
 |---|---|
 | `generate_synthetic_data.py` | Generates synthetic raw data with intentional anomalies |
 | `raw_apps_data.csv` | Raw output from the data generator |
-| `01_bronze_eda_audit.sql` | Exploratory data analysis and audit queries on the raw data |
-| `02_silver_transformation.sql` | Full silver-layer cleaning and deduplication pipeline |
-| `03_gold_star_schema.sql` | Gold-layer star schema — `dim_users` and `fact_session` |
+| `Bronze` | Exploratory data analysis and audit queries on the raw data |
+| `Silver` | Full silver-layer cleaning and deduplication pipeline |
+| `Gold` | Gold-layer star schema — `dim_users` and `fact_session` |
 | `Language_apps_performance.pbix` | Power BI dashboard |
 
 ---
@@ -48,8 +48,8 @@ raw_apps_data         clean_apps_data            dim_users
 ### Bronze
 Raw CSV data loaded as-is into `staging.raw_apps_data`. No transformations applied.
 
-### Silver — `02_silver_transformation.sql`
-The raw data is cleaned and transformed through a multi-step CTE pipeline in PostgreSQL.
+### Silver — `silver_transformation.sql`
+The raw data is cleaned and transformed through a multi-step CTE pipeline.
 
 The pipeline covers:
 
@@ -72,7 +72,7 @@ This is implemented as a pairwise self-join with NULL-safe column scoring, rathe
 
 > **Production note:** The self-join approach is O(n²) and suited to small-to-medium datasets. At scale, a blocking or profile-hashing strategy would be used instead.
 
-### Gold — `03_gold_star_schema.sql`
+### Gold — `gold_star_schema.sql`
 Splits the clean silver table into a star schema:
 
 - **`analytics.dim_users`** — one row per user, with `user_key` as a surrogate primary key.
@@ -84,7 +84,7 @@ Splits the clean silver table into a star schema:
 ## Tools & Technologies
 
 - **Python** — data generation (`Faker`, `pandas`)
-- **PostgreSQL** — data pipeline (EDA, cleaning, transformation, star schema)
+- **PostgreSQL/Snowflake** — data pipeline (EDA, cleaning, transformation, star schema)
 - **Power BI** — dashboard and visualisations
 
 ---
